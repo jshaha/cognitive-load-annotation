@@ -61,4 +61,39 @@ def create_app(config_class=Config):
 
         print(f'Admin user "{username}" created successfully!')
 
+    @app.cli.command('seed-articles')
+    def seed_articles():
+        """Seed the database with sample articles."""
+        import json
+        import os
+        from app.models import Article
+
+        # Check if articles already exist
+        if Article.query.count() > 0:
+            print(f'Database already has {Article.query.count()} articles. Skipping seed.')
+            return
+
+        # Load sample articles
+        sample_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                                   'sample_data', 'sample_articles.json')
+
+        if not os.path.exists(sample_path):
+            print(f'Sample file not found at {sample_path}')
+            return
+
+        with open(sample_path, 'r') as f:
+            articles = json.load(f)
+
+        for a in articles:
+            article = Article(
+                title=a['title'],
+                source=a.get('source', ''),
+                url=a.get('url', ''),
+                full_text=a['full_text']
+            )
+            db.session.add(article)
+
+        db.session.commit()
+        print(f'Successfully added {len(articles)} articles!')
+
     return app
