@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}All Articles - Admin{% endblock %}
+
+{% block content %}
+<div class="admin-articles">
+    <h1>All Articles</h1>
+
+    <div class="admin-actions">
+        <a href="{{ url_for('admin.upload') }}" class="btn btn-primary">Upload More Articles</a>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+
+    {% if articles %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Source</th>
+                <th>Publish Date</th>
+                <th>Annotations</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for article, count in articles %}
+            <tr class="{% if count < 5 %}needs-ratings{% endif %}">
+                <td>{{ article.id }}</td>
+                <td>{{ article.title[:60] }}{% if article.title|length > 60 %}...{% endif %}</td>
+                <td>{{ article.source or 'N/A' }}</td>
+                <td>{{ article.publish_date.strftime('%Y-%m-%d') if article.publish_date else 'N/A' }}</td>
+                <td>
+                    <span class="annotation-count {% if count < 5 %}low{% endif %}">
+                        {{ count }}
+                    </span>
+                </td>
+                <td>
+                    <a href="{{ url_for('admin.article_annotations', article_id=article.id) }}"
+                       class="btn btn-small">View Annotations</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="no-data">No articles in the database. <a href="{{ url_for('admin.upload') }}">Upload some articles</a> to get started.</p>
+    {% endif %}
+</div>
+{% endblock %}

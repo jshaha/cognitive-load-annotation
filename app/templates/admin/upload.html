@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Articles - Admin{% endblock %}
+
+{% block content %}
+<div class="admin-upload">
+    <h1>Upload Articles</h1>
+
+    <div class="upload-instructions">
+        <h3>File Format Requirements</h3>
+
+        <h4>JSON Format:</h4>
+        <pre><code>[
+  {
+    "title": "Article Title",
+    "source": "Publication Name",
+    "url": "https://example.com/article",
+    "publish_date": "2024-01-15",
+    "full_text": "Full article content here..."
+  }
+]</code></pre>
+
+        <h4>CSV Format:</h4>
+        <p>Required columns: <code>title</code>, <code>full_text</code></p>
+        <p>Optional columns: <code>source</code>, <code>url</code>, <code>publish_date</code></p>
+
+        <pre><code>title,source,url,publish_date,full_text
+"Article Title","Publication Name","https://example.com","2024-01-15","Full article content..."</code></pre>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="upload-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-group">
+            <label for="file">Select File (JSON or CSV)</label>
+            <input type="file" id="file" name="file" accept=".json,.csv" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Upload Articles</button>
+    </form>
+
+    <div class="back-link">
+        <a href="{{ url_for('admin.dashboard') }}">&larr; Back to Admin Dashboard</a>
+    </div>
+</div>
+{% endblock %}

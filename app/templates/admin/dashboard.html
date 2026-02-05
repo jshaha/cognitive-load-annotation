@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Cognitive Load Annotation{% endblock %}
+
+{% block content %}
+<div class="admin-dashboard">
+    <h1>Admin Dashboard</h1>
+
+    <div class="admin-actions">
+        <a href="{{ url_for('admin.upload') }}" class="btn btn-primary">Upload Articles</a>
+        <a href="{{ url_for('admin.articles_list') }}" class="btn btn-secondary">View All Articles</a>
+        <a href="{{ url_for('admin.export_csv') }}" class="btn btn-secondary">Export All Data (CSV)</a>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Total Articles</h3>
+            <div class="stat-number">{{ total_articles }}</div>
+        </div>
+
+        <div class="stat-card">
+            <h3>Total Annotations</h3>
+            <div class="stat-number">{{ total_annotations }}</div>
+        </div>
+
+        <div class="stat-card">
+            <h3>Total Users</h3>
+            <div class="stat-number">{{ total_users }}</div>
+        </div>
+
+        <div class="stat-card">
+            <h3>Articles Needing Ratings</h3>
+            <div class="stat-number">{{ articles_needing_ratings }}</div>
+            <span class="stat-subtitle">(less than 5 ratings)</span>
+        </div>
+    </div>
+
+    {% if avg_scores %}
+    <div class="avg-scores-section">
+        <h2>Average Scores Across All Annotations</h2>
+        <div class="scores-grid">
+            <div class="score-item">
+                <span class="score-label">Mental Effort</span>
+                <span class="score-value">{{ "%.1f"|format(avg_scores.mental_effort or 0) }}/10</span>
+            </div>
+            <div class="score-item">
+                <span class="score-label">Background Knowledge</span>
+                <span class="score-value">{{ "%.1f"|format(avg_scores.background_knowledge or 0) }}/10</span>
+            </div>
+            <div class="score-item">
+                <span class="score-label">Emotional Drain</span>
+                <span class="score-value">{{ "%.1f"|format(avg_scores.emotional_drain or 0) }}/10</span>
+            </div>
+            <div class="score-item">
+                <span class="score-label">Clarity</span>
+                <span class="score-value">{{ "%.1f"|format(avg_scores.clarity or 0) }}/10</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if annotations_by_day %}
+    <div class="chart-section">
+        <h2>Annotations Per Day (Recent)</h2>
+        <div class="simple-chart">
+            {% for day in annotations_by_day %}
+            <div class="chart-bar-container">
+                <div class="chart-bar" style="height: {{ (day.count / 10) * 100 }}px; min-height: 20px;">
+                    {{ day.count }}
+                </div>
+                <div class="chart-label">{{ day.date }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

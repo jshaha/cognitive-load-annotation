@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Cognitive Load Annotation{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <h1>Welcome, {{ current_user.username }}!</h1>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Articles Rated</h3>
+            <div class="stat-number">{{ total_annotations }}</div>
+        </div>
+
+        <div class="stat-card">
+            <h3>Articles Remaining</h3>
+            <div class="stat-number">{{ articles_remaining }}</div>
+        </div>
+
+        <div class="stat-card">
+            <h3>Total in Database</h3>
+            <div class="stat-number">{{ total_articles }}</div>
+        </div>
+
+        <div class="stat-card">
+            <h3>Completion</h3>
+            <div class="stat-number">
+                {% if total_articles > 0 %}
+                    {{ ((total_annotations / total_articles) * 100)|round(1) }}%
+                {% else %}
+                    0%
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="action-section">
+        <a href="{{ url_for('main.next_article') }}" class="btn btn-primary btn-large">
+            Rate Next Article
+        </a>
+    </div>
+
+    {% if avg_scores %}
+    <div class="avg-scores-section">
+        <h2>Your Average Ratings</h2>
+        <div class="scores-grid">
+            <div class="score-item">
+                <span class="score-label">Mental Effort</span>
+                <span class="score-value">{{ avg_scores.mental_effort|round(1) }}/10</span>
+            </div>
+            <div class="score-item">
+                <span class="score-label">Background Knowledge</span>
+                <span class="score-value">{{ avg_scores.background_knowledge|round(1) }}/10</span>
+            </div>
+            <div class="score-item">
+                <span class="score-label">Emotional Drain</span>
+                <span class="score-value">{{ avg_scores.emotional_drain|round(1) }}/10</span>
+            </div>
+            <div class="score-item">
+                <span class="score-label">Clarity</span>
+                <span class="score-value">{{ avg_scores.clarity|round(1) }}/10</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if recent_annotations %}
+    <div class="recent-section">
+        <h2>Recent Annotations</h2>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Article</th>
+                    <th>Mental Effort</th>
+                    <th>Background</th>
+                    <th>Emotional</th>
+                    <th>Clarity</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for annotation in recent_annotations %}
+                <tr>
+                    <td>{{ annotation.article.title[:50] }}{% if annotation.article.title|length > 50 %}...{% endif %}</td>
+                    <td>{{ annotation.mental_effort_score }}</td>
+                    <td>{{ annotation.background_knowledge_score }}</td>
+                    <td>{{ annotation.emotional_drain_score }}</td>
+                    <td>{{ annotation.clarity_score }}</td>
+                    <td>{{ annotation.timestamp_submitted.strftime('%Y-%m-%d') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Annotations for {{ article.title[:50] }} - Admin{% endblock %}
+
+{% block content %}
+<div class="admin-annotations">
+    <h1>Annotations for: {{ article.title }}</h1>
+
+    <div class="article-info">
+        <p><strong>Source:</strong> {{ article.source or 'N/A' }}</p>
+        <p><strong>Publish Date:</strong> {{ article.publish_date.strftime('%Y-%m-%d') if article.publish_date else 'N/A' }}</p>
+        <p><strong>Total Annotations:</strong> {{ annotations|length }}</p>
+    </div>
+
+    {% if annotations %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Mental Effort</th>
+                <th>Background</th>
+                <th>Emotional</th>
+                <th>Clarity</th>
+                <th>Time (s)</th>
+                <th>Active (s)</th>
+                <th>Scroll %</th>
+                <th>Scroll Back</th>
+                <th>Pauses</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for annotation in annotations %}
+            <tr>
+                <td>{{ annotation.user.username }}</td>
+                <td>{{ annotation.mental_effort_score }}</td>
+                <td>{{ annotation.background_knowledge_score }}</td>
+                <td>{{ annotation.emotional_drain_score }}</td>
+                <td>{{ annotation.clarity_score }}</td>
+                <td>{{ "%.1f"|format(annotation.time_spent_seconds or 0) }}</td>
+                <td>{{ "%.1f"|format(annotation.active_time_seconds or 0) }}</td>
+                <td>{{ "%.1f"|format(annotation.scroll_depth_percent or 0) }}%</td>
+                <td>{{ annotation.scroll_back_count or 0 }}</td>
+                <td>{{ annotation.pause_count or 0 }}</td>
+                <td>{{ annotation.timestamp_submitted.strftime('%Y-%m-%d %H:%M') }}</td>
+            </tr>
+            {% if annotation.optional_comments %}
+            <tr class="comment-row">
+                <td colspan="11"><em>Comment:</em> {{ annotation.optional_comments }}</td>
+            </tr>
+            {% endif %}
+            {% if annotation.difficult_passages.count() > 0 %}
+            <tr class="passages-row">
+                <td colspan="11">
+                    <strong>Difficult Passages:</strong>
+                    <ul>
+                        {% for passage in annotation.difficult_passages %}
+                        <li>"{{ passage.text_content[:100] }}{% if passage.text_content|length > 100 %}...{% endif %}"</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="no-data">No annotations yet for this article.</p>
+    {% endif %}
+
+    <div class="back-link">
+        <a href="{{ url_for('admin.articles_list') }}">&larr; Back to Articles List</a>
+    </div>
+</div>
+{% endblock %}

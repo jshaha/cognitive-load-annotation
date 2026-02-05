@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }} - Cognitive Load Annotation{% endblock %}
+
+{% block content %}
+<div class="article-container">
+    <div class="article-header">
+        <h1>{{ article.title }}</h1>
+        <div class="article-meta">
+            {% if article.source %}
+                <span class="source">{{ article.source }}</span>
+            {% endif %}
+            {% if article.publish_date %}
+                <span class="date">{{ article.publish_date.strftime('%B %d, %Y') }}</span>
+            {% endif %}
+            {% if article.url %}
+                <a href="{{ article.url }}" target="_blank" class="original-link">View Original</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="article-content" id="article-text">
+        {{ article.full_text|safe }}
+    </div>
+
+    <div class="highlight-instructions">
+        <p><strong>Tip:</strong> Select any text you find difficult to understand, then click "Mark as Difficult" to highlight it.</p>
+    </div>
+
+    <div id="highlight-popup" class="highlight-popup hidden">
+        <button type="button" id="mark-difficult-btn" class="btn btn-small">Mark as Difficult</button>
+    </div>
+
+    <div id="difficult-passages-list" class="difficult-passages-list hidden">
+        <h4>Marked Difficult Passages:</h4>
+        <ul id="passages-ul"></ul>
+    </div>
+
+    <div class="rating-section">
+        <h2>Rate This Article</h2>
+
+        <form id="rating-form" class="rating-form">
+            <div class="slider-group">
+                <label for="mental_effort">
+                    Mental Effort
+                    <span class="slider-hint">(1=Easy, 10=Very Demanding)</span>
+                </label>
+                <div class="slider-container">
+                    <input type="range" id="mental_effort" name="mental_effort_score"
+                           min="1" max="10" value="5" class="slider" data-touched="false">
+                    <span class="slider-value" id="mental_effort_value">5</span>
+                </div>
+            </div>
+
+            <div class="slider-group">
+                <label for="background_knowledge">
+                    Background Knowledge Required
+                    <span class="slider-hint">(1=None Needed, 10=Extensive Required)</span>
+                </label>
+                <div class="slider-container">
+                    <input type="range" id="background_knowledge" name="background_knowledge_score"
+                           min="1" max="10" value="5" class="slider" data-touched="false">
+                    <span class="slider-value" id="background_knowledge_value">5</span>
+                </div>
+            </div>
+
+            <div class="slider-group">
+                <label for="emotional_drain">
+                    Emotional Drain
+                    <span class="slider-hint">(1=Neutral, 10=Very Draining)</span>
+                </label>
+                <div class="slider-container">
+                    <input type="range" id="emotional_drain" name="emotional_drain_score"
+                           min="1" max="10" value="5" class="slider" data-touched="false">
+                    <span class="slider-value" id="emotional_drain_value">5</span>
+                </div>
+            </div>
+
+            <div class="slider-group">
+                <label for="clarity">
+                    Clarity
+                    <span class="slider-hint">(1=Confusing, 10=Very Clear)</span>
+                </label>
+                <div class="slider-container">
+                    <input type="range" id="clarity" name="clarity_score"
+                           min="1" max="10" value="5" class="slider" data-touched="false">
+                    <span class="slider-value" id="clarity_value">5</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="comments">Optional Comments</label>
+                <textarea id="comments" name="optional_comments" rows="3"
+                          placeholder="Any additional thoughts about this article..."></textarea>
+            </div>
+
+            <button type="submit" id="submit-btn" class="btn btn-primary btn-large" disabled>
+                Submit Rating
+            </button>
+            <p class="submit-hint" id="submit-hint">Please adjust all four sliders to enable submission.</p>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/tracker.js') }}"></script>
+<script>
+    const articleId = {{ article.id }};
+    const submitUrl = "{{ url_for('main.submit_annotation', article_id=article.id) }}";
+    const dashboardUrl = "{{ url_for('main.dashboard') }}";
+    const csrfToken = "{{ csrf_token() }}";
+</script>
+{% endblock %}
